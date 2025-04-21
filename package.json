@@ -1,0 +1,15 @@
+{
+    "name": "mqtt-to-mysql",
+    "version": "1.0.0",
+    "description": "A Node.js script to log MQTT sensor data into MySQL",
+    "main": "mqtt-to-mysql.js",
+    "scripts": {
+      "start": "node mqtt-to-mysql.js"
+    },
+    "author": "Dhyey Thummar",
+    "license": "MIT",
+    "dependencies": {
+      "mqtt": "^5.0.0",
+      "mysql2": "^3.6.0"
+    }
+  }

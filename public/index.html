@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Control Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</head>
+<body>
+    <!-- Side Navigation -->
+    <div class="sidenav">
+        <div class="sidenav-header">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </div>
+        <div class="sidenav-links">
+            <a href="#device-controls" class="sidenav-link">
+                <i class="fas fa-sliders-h"></i>
+                <span>Device Controls</span>
+            </a>
+            <a href="#occupancy" class="sidenav-link">
+                <i class="fas fa-users"></i>
+                <span>Occupancy Count</span>
+            </a>
+            <a href="#temperature" class="sidenav-link">
+                <i class="fas fa-temperature-high"></i>
+                <span>Temperature</span>
+            </a>
+            <a href="#co2" class="sidenav-link">
+                <i class="fas fa-wind"></i>
+                <span>CO<sub>2</sub> Level</span>
+            </a>
+            <a href="#humidity" class="sidenav-link">
+                <i class="fas fa-tint"></i>
+                <span>Humidity</span>
+            </a>
+            <a href="#feels-like" class="sidenav-link">
+                <i class="fas fa-thermometer-half"></i>
+                <span>Feels Like</span>
+            </a>
+        </div>
+        <div class="sidenav-toggle" id="sidenavToggle">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1><i>IoT Project: Personalized Climate Control System</i></h1><br>
+            <h2>Climate Status Dashboard</h2>
+            <p class="subtitle"><br># Real-time monitoring and control of your environmental conditions</p>
+        </div>
+
+        <!-- Connection Status Block -->
+        <div class="connection-status">
+            <div class="connection-indicator">
+                <div class="status-dot" id="connectionStatusDot"></div>
+                <p>MQTT Connection : <span id="connectionStatus"> Connecting...</span></p>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <!-- Occupancy Counter -->
+            <div id="occupancy" class="section-anchor"></div>
+            <div class="occupancy-block">
+                <i class="fas fa-users"></i><b> Room Occupancy : </b><span id="occupancy-value">--</span>
+            </div>
+            
+            <!-- Row 1: First 2 Graph Parameters -->
+            <div class="row">
+                <div id="temperature" class="section-anchor"></div>
+                <div class="block large">
+                    <div class="block-header">
+                        <h3><i class="fas fa-temperature-high"></i> Temperature</h3>
+                        <div class="trend up">
+                            <span class="trend-icon"><i class="fas fa-arrow-up"></i></span>
+                            <span id="tempTrend">--</span>
+                        </div>
+                    </div>
+                    <div class="value-container">
+                        <div class="value temp"><span id="temperature-value">--</span><small>°C</small></div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="tempChart"></canvas>
+                    </div>
+                </div>
+                
+                <div id="humidity" class="section-anchor"></div>
+                <div class="block large">
+                    <div class="block-header">
+                        <h3><i class="fas fa-tint"></i> Humidity</h3>
+                        <div class="trend down">
+                            <span class="trend-icon"><i class="fas fa-arrow-down"></i></span>
+                            <span id="humidityTrend">--</span>
+                        </div>
+                    </div>
+                    <div class="value-container">
+                        <div class="value humidity"><span id="humidity-value">--</span><small>%</small></div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="humidityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Next 2 Graph Parameters -->
+            <div class="row">
+                <div id="co2" class="section-anchor"></div>
+                <div class="block large">
+                    <div class="block-header">
+                        <h3><i class="fas fa-wind"></i> CO<sub>2</sub> Level</h3>
+                        <div class="trend stable">
+                            <span class="trend-icon"><i class="fas fa-equals"></i></span>
+                            <span id="co2Trend">--</span>
+                        </div>
+                    </div>
+                    <div class="value-container">
+                        <div class="value co2"><span id="co2Level">--</span><small>ppm</small></div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="co2Chart"></canvas>
+                    </div>
+                </div>
+                
+                <div id="feels-like" class="section-anchor"></div>
+                <div class="block large">
+                    <div class="block-header">
+                        <h3><i class="fas fa-thermometer-half"></i> Feels Like Temperature</h3>
+                        <div class="trend up">
+                            <span class="trend-icon"><i class="fas fa-arrow-up"></i></span>
+                            <span id="feelsLikeTrend">--</span>
+                        </div>
+                    </div>
+                    <div class="value-container">
+                        <div class="value feels-like"><span id="feelsLike">--</span><small>°C</small></div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="feelsLikeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="device-controls" class="section-anchor"></div>
+            <div class="block control-mode">
+                <div class="device-control">
+                    <h3><i class="fas fa-cog"></i> Control Mode</h3>
+                    <div class="mode-checkboxes">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="autoCheck">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-label">Auto</span>
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="manualCheck">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-label">Manual</span>
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="disabledCheck">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-label">Disabled</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Row 3: Device Controls -->
+            <div class="row device-controls-row">
+                <div class="block small">
+                    <div class="device-control">
+                        <h3><i class="fas fa-snowflake"></i> Air Conditioner</h3>
+                        <div class="status-indicator">
+                            <div class="status-dot" id="acStatusDot"></div>
+                            <p>Status: <span id="acStatus">--</span></p>
+                        </div>
+                        <button class="btn ac" id="acButton" onclick="toggleDevice('ac')" disabled>
+                            <i class="fas fa-power-off"></i> Toggle AC
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="block small">
+                    <div class="device-control">
+                        <h3><i class="fas fa-fan"></i> Fan</h3>
+                        <div class="status-indicator">
+                            <div class="status-dot" id="fanStatusDot"></div>
+                            <p>Status: <span id="fanStatus">--</span></p>
+                        </div>
+                        <button class="btn fan" id="fanButton" onclick="toggleDevice('fan')" disabled>
+                            <i class="fas fa-power-off"></i> Toggle Fan
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="block small">
+                    <div class="device-control">
+                        <h3><i class="fas fa-lungs"></i> Air Purifier</h3>
+                        <div class="status-indicator">
+                            <div class="status-dot" id="airPurifierStatusDot"></div>
+                            <p>Status: <span id="airPurifierStatus">--</span></p>
+                        </div>
+                        <button class="btn purifier" id="airPurifierButton" onclick="toggleDevice('airPurifier')" disabled>
+                            <i class="fas fa-power-off"></i> Toggle Purifier
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="block small">
+                    <div class="device-control">
+                        <h3><i class="fas fa-door-open"></i> Vent</h3>
+                        <div class="status-indicator">
+                            <div class="status-dot" id="ventStatusDot"></div>
+                            <p>Status: <span id="ventStatus">--</span></p>
+                        </div>
+                        <button class="btn vent" id="ventButton" onclick="toggleDevice('vent')" disabled>
+                            <i class="fas fa-power-off"></i> Toggle Vent
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><h4 style="font-size:17px">Team Members : <span style="color:aqua">Shivansh Santoki | Ayush Kanani | Dhyey Thummar</span></h4></p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Side navigation toggle functionality
+        document.getElementById('sidenavToggle').addEventListener('click', function() {
+            document.body.classList.toggle('sidenav-collapsed');
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.sidenav-link').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
